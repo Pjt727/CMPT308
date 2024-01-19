@@ -1,0 +1,224 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% CMPT 435
+% Lab Zero
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Short Sectioned Assignment
+% LaTeX Template
+% Version 1.0 (5/5/12)
+%
+% This template has been downloaded from: http://www.LaTeXTemplates.com
+% Original author: % Frits Wenneker (http://www.howtotex.com)
+% License: CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% Modified by Alan G. Labouseur  - alan@labouseur.com, and Patrick Tyler - Patrick.Tyler1@marist.edu
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[letterpaper, 10pt]{article} 
+
+\usepackage[english]{babel} % English language/hyphenation
+\usepackage{graphicx}
+\usepackage[lined,linesnumbered,commentsnumbered]{algorithm2e}
+\usepackage{listings}
+\usepackage{fancyhdr} % Custom headers and footers
+\pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\usepackage{lastpage}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{xurl}
+\usepackage{multicol}
+
+% Stolen from https://www.overleaf.com/learn/latex/Code_listing 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle, language=c++}
+
+
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[R]{}
+
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+
+\title{	
+   \normalfont \normalsize 
+   \textsc{CMPT 308 - Spring 2024 - Dr. Labouseur} \\[10pt] % Header stuff.
+   \horrule{0.5pt} \\[0.25cm] 	% Top horizontal rule
+   \huge Lab 1 -- ~Data \& Information\\     	    % Assignment title
+   \horrule{0.5pt} \\[0.25cm] 	% Bottom horizontal rule
+}
+
+\author{Patrick Tyler \\ \normalsize Patrick.Tyler1@marist.edu}
+
+\date{\normalsize\today} 	% Today's date.
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%   CONTENT SECTION
+%----------------------------------------------------------------------------------------
+
+% - -- -  - -- -  - -- -  -
+\section{Data vs Information}
+Data is simply "stuff" in the world.
+Data can take the form of anything... numbers, lines, or words.
+Data, however, cannot make conclusions. 
+Information is data empowered with the context to make useful statements
+   the trends or lack there of.
+For example, if we had the numbers 98 90 70 63 they are meaningless without context;
+they carry no information, but they are still perfectly valid data.
+Now let's add some context: those numbers are 4 grades from a professors class of 20.
+Now this data means something, it represents some information.
+We could make statements such as the average of these grades are 80.25 
+   because it makes to average these numbers in the given context.
+We could even try to make farther reaching statement such as the average
+   for the entire class is probably around 80.25.
+Still, we must be careful with how much information we actually have and
+   whether can can acurately make certain assumptions.
+In example, the context and information could change: let's say theses were
+   the top 4 student grades.
+The data remains the same but the context changes everything.
+There a myriad of conclusions you might want to make about this data 
+   but have you considered all the information and especially 
+   the missing information?
+What is the grading scale?
+Are these even final grades?
+What is rigor of the class?
+\newline
+\newline
+Databases attempt to organize data in efficient ways whose structure,
+    most importantly, aimes to convey all of the respective information.
+Organizations who maintain a lot of data want to embed their "business rules"
+    directly into how they store their data, and database are perfect for this.
+For example, let's look at the Marist Banner system.
+(I not have access to the actual database so this is inferred from
+    the api their frontend website uses, an example section json entry 
+    is below for reference)
+Firstly, Banner stores this "id" attribute. From the outside this seems like
+    a completely obscure number with no meaning.
+And, it is, this number does not hold any meaning in the way numbers generally
+   have meaning.
+It is likely only there to give each section a unique identifier.
+Without being coupled with the information of being an "id" this data is a
+   completely useless number.
+Sections also likely have a one-to-many reltionship with "faculty" and
+   "meetingsFaculty".
+This relational idea gives information: there is a group of "faculty" 
+   and "meetingsFaculty" which which can be apart of a section.
+Which, from what we know about courses at Marist, makes sense.
+Every section has one to many teachers and some meeting times.
+Databases organize data in order applying the business logic of the organization
+   forming their data into information.
+\section{Data Models}
+Hierarchical databases store their data through a tree-like structure conveying
+   information through relationships such as parent and child. 
+Every child can only have a single parent and a parent can have an indefinite
+   of children.
+These contrainsts nicely represent data that can form perfect trees.
+However it breaks down when any other relationship needs to be represented. 
+For instance, let's go back to the Marist database imagine a simplistic version
+   of storing sections, meetings, and their teachers.
+In a hierarchical database sections and meetings are a perfect match.
+At least simplistically, every section has 0 to many meetings and every
+   meeting has exactly one parent.
+However, representing their teachers is difficult even if we simplify that
+   each section only has a single teacher.
+Are they children of section?
+Then we would lose the information that children of sections are meetings.
+Are they children of meetings?
+This could work but then we would be storing professor data for each meeting.
+Whenever data is repeatibly stored it not only takes up more space but even more
+   worryingly can lead to update, insertion, and deletion anomalies.
+\newline
+\newline
+Maybe another type of data models can help us!
+Network databases permit a child to have more than one parent.
+This means we can have one instance of professor and all of their 
+   meetings point to them.
+We maintain the structure/ information that children of sections are meetings
+   as well as children of meetings are professors without duplication.
+This is great until we have a professor that does not teach any meetings.
+Where should we put this professor?
+There is no good answer in either of these databases.
+This is one of the fundamental reasons why relational databases are
+   largely thought as better.
+\newline
+\newline
+There is another type of storage method known as XML.
+I personally have to appreciate XML as I use HTMX, a small javascript library which
+   uses html attributes to send AJAX requests to an endpoint.
+I can represent all of my needs to send information from my frontend to my backend.
+However, I think it is better suited as a data transfer structure rather than
+   a full data storage and query system because it runs into the same problems
+   as network database. 
+XML does allow multiple parents and children but still does not have a good place
+   for data that is not connected.
+
+
+\section{Proof of Life}
+ 
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{./assets/pg-admin.png}
+  \caption{PG admin running on my computer showing the cap database}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.9\textwidth]{assets/postgre.png}
+  \caption{Postgre sql installed}
+\end{figure}
+
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.6\textwidth]{assets/psql.png}
+  \caption{psql cli tool working in powershell }
+\end{figure}
+ 
+\pagebreak
+\begin{multicols}{2}
+\lstinputlisting[
+     caption={A Course's section from Banner's api},
+     label={api}]{./1lab/api.json}
+\end{multicols}
+\end{document}

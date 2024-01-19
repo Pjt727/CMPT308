@@ -1,0 +1,84 @@
+{
+ "id": 164935,
+ "term": "202320",
+ "termDesc": "Spring 2023",
+ "courseReferenceNumber": "12114",
+ "partOfTerm": "1",
+ "courseNumber": "331L",
+ "subject": "CMPT",
+ "subjectDescription": "Computing Technology",
+ "sequenceNumber": "111",
+ "campusDescription": "Marist College Campus",
+ "scheduleTypeDescription": "Lecture",
+ "courseTitle": "THEORY OF PROGRAM LANG",
+ "maximumEnrollment": 25,
+ "enrollment": 22,
+ "seatsAvailable": 3,
+ "waitCapacity": 0,
+ "waitAvailable": 0,
+ "creditHourLow": 3,
+ "openSection": true,
+ "faculty": [
+  {
+   "bannerId": "38372",
+   "displayName": "Labouseur, Alan",
+   "emailAddress": "Alan.Labouseur@marist.edu",
+   "primaryIndicator": true
+  }
+ ],
+ "meetingsFaculty": [
+  {
+   "category": "01",
+   "meetingTime": {
+    "beginTime": "0800",
+    "building": "HC",
+    "buildingDescription": "Hancock",
+    "campus": "AAA",
+    "campusDescription": "Marist College Campus",
+    "category": "01",
+    "creditHourSession": 3.0,
+    "endDate": "05/12/2023",
+    "endTime": "0915",
+    "friday": false,
+    "hoursWeek": 1.25,
+    "meetingType": "LEC",
+    "meetingTypeDescription": "Lecture",
+    "monday": false,
+    "room": "2005",
+    "saturday": false,
+    "startDate": "01/17/2023",
+    "sunday": false,
+    "thursday": false,
+    "tuesday": false,
+    "wednesday": true
+   }
+  },
+  {
+   "category": "01",
+   "meetingTime": {
+    "beginTime": "1100",
+    "building": "HC",
+    "buildingDescription": "Hancock",
+    "campus": "AAA",
+    "campusDescription": "Marist College Campus",
+    "category": "01",
+    "creditHourSession": 0.0,
+    "endDate": "05/12/2023",
+    "endTime": "1215",
+    "friday": true,
+    "hoursWeek": 1.25,
+    "meetingType": "LEC",
+    "meetingTypeDescription": "Lecture",
+    "monday": false,
+    "room": "2005",
+    "saturday": false,
+    "startDate": "01/17/2023",
+    "sunday": false,
+    "thursday": false,
+    "tuesday": false,
+    "wednesday": false
+   }
+  }
+ ],
+ "sectionAttributes": []
+}
