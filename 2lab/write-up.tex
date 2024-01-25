@@ -120,6 +120,31 @@ A primary key is the candidate key which is chosen to unique identify the row.
 It is also very important to consider the business rules associated with the database when selecting keys.
 A primary key should functionally be unique within the associated domain.
 \section{Data Types in Tables}
+Without data types whatever memory stored is uselesss series of 
+   binary digits. 
+Giving your datatypes the most strict type that is possible
+   is crucial to getting information our of your data.
+Imagine you have to store students as a table in your database
+   let's berak down the data types that would need to be stored.
+Columns and attributes such as first name and last name are fairly
+   obviously strings of some length.
+However, it is objectively bettter to separate these in most use cases
+   into the two fields instead of something like "name" as being
+   specific extracts more information.
+Another field you would likely want to include grade year.
+If these are students in a highschool, for example, it
+   may be tempting to store their grade as a string.
+This ends up being a terrible idea: when data gets entered
+   it has full access to all string representation.
+Should people enter a freshmen as freshmen, Freshmen, freshman,
+   Freshman, freshy, first-year, etc.
+It would be much better to store it has a enumeration of 
+   possiblites.
+In college, this representation would be less useful as 
+   grade-level does not carry as much information as it does
+   for high school.
+It may be better to not even have grade-level stored and instead
+   have it be derived from credits earned or courses takens.
 \section{Relational Rules}
 Making databases ensure relational rules upholds the referential integrity of the data helping to render 
    information.
