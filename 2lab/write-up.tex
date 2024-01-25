@@ -35,6 +35,7 @@
 \usepackage{titlesec}
 \usepackage{xurl}
 \usepackage{multicol}
+\usepackage{csvsimple}
 
 % Stolen from https://www.overleaf.com/learn/latex/Code_listing 
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -99,38 +100,10 @@
 
 % - -- -  - -- -  - -- -  -
 \section{Select * Queries}
-\begin{figure}
-    \centering
-    \includegraphics[.8\linewidth]{assets/select-people.png}
-    \caption{select * from People}
-    \label{fig:select-people}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[.8\linewidth]{assets/select-customers.png}
-    \caption{select * from Customers}
-    \label{fig:select-customers}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[.8\linewidth]{assets/select-agents.png}
-    \caption{select * from Agents}
-    \label{fig:select-agents}
-\end{figure}
-\begin{figure}
-    \centering
-    \includegraphics[.8\linewidth]{assets/select-products.png}
-    \caption{select * from Products!}
-    \label{fig:select-products}
-\end{figure}
-
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[.8\linewidth]{assets/select-orders.png}
-  \caption{select * from orders}
-  \label{fig:select-orders}
-\end{figure}
+\lstinputlisting{queries/select-people.sql}
+\csvautotabular{queries/select-people.csv}
+\lstinputlisting{queries/select-product.sql}
+\csvautotabular{queries/select-product.csv}
 \section{Primary key, Candidate key, and Superkey}
 A super key is a set of fields (at least one) of a table which uniquely identifies each row.
 A candidate key is a the minimal length of super keys which uniquely identfies each rows.
