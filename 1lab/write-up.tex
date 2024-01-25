@@ -99,53 +99,6 @@
 
 % - -- -  - -- -  - -- -  -
 \section{Data vs Information}
-Data is simply "stuff" in the world.
-Data can take the form of anything... numbers, lines, or words.
-Data, however, cannot make conclusions. 
-Information is data empowered with the context to make useful statements
-   the trends or lack there of.
-For example, if we had the numbers 98 90 70 63 they are meaningless without context;
-they carry no information, but they are still perfectly valid data.
-Now let's add some context: those numbers are 4 grades from a professors class of 20.
-Now this data means something, it represents some information.
-We could make statements such as the average of these grades are 80.25 
-   because it makes to average these numbers in the given context.
-We could even try to make farther reaching statement such as the average
-   for the entire class is probably around 80.25.
-Still, we must be careful with how much information we actually have and
-   whether can can acurately make certain assumptions.
-In example, the context and information could change: let's say theses were
-   the top 4 student grades.
-The data remains the same but the context changes everything.
-There a myriad of conclusions you might want to make about this data 
-   but have you considered all the information and especially 
-   the missing information?
-What is the grading scale?
-Are these even final grades?
-What is rigor of the class?
-\newline
-\newline
-Databases attempt to organize data in efficient ways whose structure,
-    most importantly, aimes to convey all of the respective information.
-Organizations who maintain a lot of data want to embed their "business rules"
-    directly into how they store their data, and database are perfect for this.
-For example, let's look at the Marist Banner system.
-(I not have access to the actual database so this is inferred from
-    the api their frontend website uses, an example section json entry 
-    is below for reference)
-Firstly, Banner stores this "id" attribute. From the outside this seems like
-    a completely obscure number with no meaning.
-And, it is, this number does not hold any meaning in the way numbers generally
-   have meaning.
-It is likely only there to give each section a unique identifier.
-Without being coupled with the information of being an "id" this data is a
-   completely useless number.
-Sections also likely have a one-to-many reltionship with "faculty" and
-   "meetingsFaculty".
-This relational idea gives information: there is a group of "faculty" 
-   and "meetingsFaculty" which which can be apart of a section.
-Which, from what we know about courses at Marist, makes sense.
-Every section has one to many teachers and some meeting times.
 Databases organize data in order applying the business logic of the organization
    forming their data into information.
 \section{Data Models}

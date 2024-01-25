@@ -102,15 +102,22 @@
 \section{Select * Queries}
 \lstinputlisting{queries/select-people.sql}
 \csvautotabular{queries/select-people.csv}
+\lstinputlisting{queries/select-customers.sql}
+\csvautotabular{queries/select-customers.csv}
+\pagebreak
+\lstinputlisting{queries/select-agents.sql}
+\csvautotabular{queries/select-agents.csv}
 \lstinputlisting{queries/select-product.sql}
 \csvautotabular{queries/select-product.csv}
+\lstinputlisting{queries/select-orders.sql}
+\csvautotabular{queries/select-orders.csv}
 \section{Primary key, Candidate key, and Superkey}
 A super key is a set of fields (at least one) of a table which uniquely identifies each row.
 A candidate key is a the minimal length of super keys which uniquely identfies each rows.
 Therefore, every candidate key is a super key but not ever super key is a candidate key.
 Any key which is of multiple fields is known as a composite key.
-A primary key is the candidate key which is chosen to unqiue identify the row.
-It is also very important to consider the business rules accociated with the database when selecting keys.
+A primary key is the candidate key which is chosen to unique identify the row.
+It is also very important to consider the business rules associated with the database when selecting keys.
 A primary key should functionally be unique within the associated domain.
 \section{Data Types in Tables}
 \section{Relational Rules}
@@ -119,9 +126,9 @@ Making databases ensure relational rules upholds the referential integrity of th
 It is good practice to follow these rules as well as infusing business rules into the database
    itself when possible.
 \subsection{First Normal Form}
-The first normal form maintains that there are no multi-valued structure whithin a field or fields
-   relating to a semantically structed need of our business.
-If a feild has some internal structure that can be pratically separated it should be. 
+The first normal form maintains that there are no multi-valued structure within a field or fields
+   relating to a semantically structured need of our business.
+If a field has some internal structure that can be practically separated it should be. 
 \subsection{Access Rows by Content Only}
 As the databases internal structure is hidden from the user or programmers,
    accessing data using concepts such as index does not make sense.
@@ -130,7 +137,7 @@ This makes sense because in postgre, for example, all tables and columns are the
 This means there is no concept of index as the underlying structure likely used is a set.
 
 \subsection{Unique Rows}
-Every row within a table should have a unique primary key rules of which have been previosly mentioned.
+Every row within a table should have a unique primary key rules of which have been previously mentioned.
 This is need to differinate and assert no duplication of the same thing within the database.
 
 \end{document}
