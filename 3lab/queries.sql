@@ -23,7 +23,7 @@ FROM Products
 WHERE 
    (city != 'Dallas' and city != 'Duluth') AND
    -- DEMORGANS
-   -- OR: NOT (city = 'Dallas' or city = 'Duluth' ) AND
+   -- NOT (city = 'Dallas' or city = 'Duluth' ) AND
    priceUSD <= '17'
 ;
 -- 7.

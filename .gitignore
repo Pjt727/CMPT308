@@ -1,6 +1,7 @@
 # image dir created
 assets
 queries.csv
+*.txt
 
 
 ## Core latex/pdflatex auxiliary files:

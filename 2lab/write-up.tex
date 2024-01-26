@@ -114,16 +114,16 @@
 \section{Primary key, Candidate key, and Superkey}
 A super key is a set of fields (at least one) of a table which uniquely identifies each row.
 A candidate key is a the minimal length of super keys which uniquely identfies each rows.
-Therefore, every candidate key is a super key but not ever super key is a candidate key.
+Therefore, every candidate key is a super key but not every super key is a candidate key.
 Any key which is of multiple fields is known as a composite key.
-A primary key is the candidate key which is chosen to unique identify the row.
+A primary key is the candidate key which is chosen to uniquely identify the row.
 It is also very important to consider the business rules associated with the database when selecting keys.
-A primary key should functionally be unique within the associated domain.
+A primary key should be functionally unique within its domain.
 \section{Data Types in Tables}
 Without data types whatever memory stored is uselesss series of 
    binary digits. 
-Giving your datatypes the most strict type that is possible
-   is crucial to getting information our of your data.
+Giving your datatypes the most strict type that possible
+   is crucial to getting the most information out of your data.
 Imagine you have to store students as a table in your database
    let's berak down the data types that would need to be stored.
 Columns and attributes such as first name and last name are fairly
@@ -144,25 +144,31 @@ In college, this representation would be less useful as
    grade-level does not carry as much information as it does
    for high school.
 It may be better to not even have grade-level stored and instead
-   have it be derived from credits earned or courses takens.
+   have it be derived from credits earned or courses passed.
+There is much more information you could include such as
+   gender, race, address, previous schooling etc.
+Each of these bits of information needs to be meticously mapped
+   to accurate data types when translating them to a column or columns.
 \section{Relational Rules}
 Making databases ensure relational rules upholds the referential integrity of the data helping to render 
    information.
 It is good practice to follow these rules as well as infusing business rules into the database
    itself when possible.
 \subsection{First Normal Form}
-The first normal form maintains that there are no multi-valued structure within a field or fields
-   relating to a semantically structured need of our business.
+The first normal form maintains that there are no multi-valued structures within a 
+    field or fields which then relate to structure within the business which
+    semantically should be separated in structure.
 If a field has some internal structure that can be practically separated it should be. 
 \subsection{Access Rows by Content Only}
-As the databases internal structure is hidden from the user or programmers,
+As the database's internal structure is hidden from the user or programmers,
    accessing data using concepts such as index does not make sense.
-This makes sense because in postgre, for example, all tables and columns are themselves
-   stored in a database.
+This makes sense because in postgres, for example, all tables and columns are 
+   themselves stored in a database.
 This means there is no concept of index as the underlying structure likely used is a set.
 
 \subsection{Unique Rows}
-Every row within a table should have a unique primary key rules of which have been previously mentioned.
-This is need to differinate and assert no duplication of the same thing within the database.
-
+Every row within a table should have a unique primary key rules of 
+   which have been previously mentioned.
+This is need to differinate and assert no duplication of similar or the same 
+   thing within the database.
 \end{document}
