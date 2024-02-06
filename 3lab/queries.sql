@@ -1,3 +1,5 @@
+-- Queries by Patrick Tyler
+-- Feb 6, 2024
 -- 1.
 SELECT orderNum, totalUSD
 FROM Orders;
