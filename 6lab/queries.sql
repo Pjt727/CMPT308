@@ -1,5 +1,9 @@
+-- Hope you don't mind my separators i do just to make sure that all queries work
+
 -- 1. Display the cities that makes the most different kinds of products. Experiment with 
 -- the rank() function.
+
+SELECT 'QUESTION 1' as Separator;
 
 SELECT RANK() OVER (ORDER by Count(p.prodid) DESC) AS rank,
     p.city, Count(p.prodid) as productCount
@@ -8,6 +12,8 @@ GROUP BY p.city;
 
 -- 2. Display the names of products whose priceUSD is less than 1% of the average 
 -- priceUSD, in alphabetical order. from A to Z.
+
+SELECT 'QUESTION 2' as Separator;
 
 SELECT p.name
 FROM Products p
@@ -20,6 +26,8 @@ ORDER BY p.name ASC;
 -- 3. Display the customer last name, product id ordered, and the totalUSD for all orders 
 -- made in March of any year, sorted by totalUSD from low to high.
 
+SELECT 'QUESTION 3' as Separator;
+
 SELECT pe.lastName, o.prodId, o.totalUSD
 FROM Orders o
 INNER JOIN People pe ON o.custId = pe.pid
@@ -28,6 +36,8 @@ ORDER BY o.totalUSD ASC;
 
 -- 4. Display the last name of all customers (in reverse alphabetical order) and their total 
 -- ordered by customer, and nothing more. Use coalesce to avoid showing NULL totals.
+
+SELECT 'QUESTION 4' as Separator;
 
 -- Their total what? Total usd spent over every order? Total amount of orders? 
 --   Total amount quantity ordered?
@@ -42,6 +52,8 @@ ORDER BY p.lastName DESC;
 -- 5. Display the names of all customers who bought products from agents based in 
 -- Chilliwack along with the names of the products they ordered, and the names of the 
 -- agents who sold it to them.
+
+SELECT 'QUESTION 5' as Separator;
 
 -- I'm gonna assume that you use "name" instead of firstname/ lastname
 --    on purpose.
@@ -64,6 +76,8 @@ GROUP BY cPeople.pid, customerName, aPeople.pid, agentName;
 -- values to the values in Orders.totalUSD. Display all rows in Orders where 
 -- Orders.totalUSD is incorrect, if any. If there are any incorrect  values, explain why they 
 -- are wrong. Round to exactly two decimal places.
+
+SELECT 'QUESTION 6' as Separator;
 
 -- The database does not store past price and discount so i'd assume any differences
 --    are because the current price is not the same as the price when they are purchased
@@ -89,6 +103,8 @@ WHERE pastUnitPriceBeforeDiscount != currentUnitPriceBeforeDiscount;
 
 -- 7. Display the first and last name of all customers who are also agents.
 
+SELECT 'QUESTION 7' as Separator;
+
 -- What is this question doing here this is like the same as #3 from lab4 and others I think
 
 SELECT p.firstName, p.lastName
@@ -100,15 +116,73 @@ INNER JOIN Agents a ON a.pid = c.pid;
 -- VIEW of all Agent and People data called PeopleAgents. Then select * from each of 
 -- them to test them.
 
+SELECT 'QUESTION 8' as Separator;
 
+-- Need to specify rows because p.pid is duplicate
+CREATE OR REPLACE VIEW PeopleCustomers AS
+SELECT p.pid, p.prefix, p.firstName, p.lastName, p.suffix, p.homeCity, p.DOB,
+    c.paymentTerms, c.discountPCT
+FROM People p
+INNER JOIN Customers c ON c.pid = p.pid;
+
+SELECT * FROM PeopleCustomers;
+
+CREATE OR REPLACE VIEW PeopleAgents AS
+SELECT p.pid, p.prefix, p.firstName, p.lastName, p.suffix, p.homeCity, p.DOB,
+    a.paymentTerms, a.commissionPCT
+FROM People p
+INNER JOIN Agents a ON a.pid = p.pid;
+
+SELECT * FROM PeopleAgents;
 
 -- 9. Display the first and last name of all customers who are also agents, this time using 
 -- the views you created.
 
+SELECT 'QUESTION 9' as Separator;
+
+-- Doesnt matter which table/view it is selected from
+SELECT c.firstName, c.lastName
+FROM PeopleCustomers c
+INNER JOIN PeopleAgents a ON c.pid = a.pid;
+
 -- 10. Compare your SQL in #7 (no views) and #9 (using views). The output is the same. 
 -- How does that work? What is the database server doing internally when it processes 
 -- the #9 query?
+/* 
 
+The database has stored procedures for views in which my inner join will operate directly into
+the store queries. This should have about the same affect as having the view selects directly 
+put into the query as subqueries. I also imagine there might be ways for the database to cache
+view results if the statistics suggest improvements.
+
+*/
 -- 11. [Bonus] What’s the difference between a LEFT OUTER JOIN and a RIGHT OUTER 
 -- JOIN? Give example queries in SQL to demonstrate. (Feel free to use the CAP database 
 -- to make your points here.)
+
+/*
+
+Generally outer joins combine tables keeping rows even if a matching ON conditions is not 
+satisfied.
+The difference between LEFT OUTER JOIN and RIGHT OUTER JOIN is which table to include
+null data on. A LEFT JOIN will keep all records on the table specified in the left table
+and the RIGHT JOIN likewise.
+
+*/
+
+SELECT 'QUESTION 11 [BONUS]' as Separator;
+
+-- Shows records only when people's homecity and product city is the same
+SELECT pe.pid, pe.homeCity, pr.prodId, pr.city
+FROM People pe
+INNER JOIN Products pr ON pe.homeCity = pr.city;
+
+-- Shows all people records and product information only when the product's city is the same
+SELECT pe.pid, pe.homeCity, pr.prodId, pr.city
+FROM People pe
+LEFT OUTER JOIN Products pr ON pe.homeCity = pr.city;
+
+-- Shows all product records and person information only when the person's home city is the same
+SELECT pe.pid, pe.homeCity, pr.prodId, pr.city
+FROM People pe
+RIGHT OUTER JOIN Products pr ON pe.homeCity = pr.city;
