@@ -122,12 +122,12 @@ WP09 & 59836 & 10-30-2005 & 35.00 \\
 \hline
 \end{tabular}
 \end{table}
-\subsection{My professional consulting opinion}
+\subsection{(1) My professional consulting opinion}
 Tycho manufacuting's board needs to fire the CEO 
     as a software company I expected better. 
 Asumming this data is stored in a csv, excel, or some
     other raw text table structure to store the spreadsheet,
-    the data is difficult to programatically add, update, delete
+    the data is difficult to programmatically add, update, delete
     additional installs and packages.
 If an install needs to be deleted for whatever reason, the
     row with that install would have to have its internal structure
@@ -140,7 +140,7 @@ Accidental deletions of packages from deleting installs could
 In my professional opinion, this data is not complex enough
     to warrant a database, but it would help organizing
     the spreadsheet more atomically.
-\subsection{Spreasheet in 1NF}
+\subsection{(2) Spreadsheet in 1NF}
 \begin{table}[h]
 \centering
 \begin{tabular}{|c|c|c|c|}
@@ -167,14 +167,14 @@ WP09 & 77740 & 05-27-2005 & 35.00 \\
 \hline
 \end{tabular}
 \end{table}
-\subsection{Primary key analaysis}
+\subsection{(3) Primary key analaysis}
 The best primary key that can be made with these columns
     is an composite key of the PackageID, TagNumber, 
     and InstallDate.
-This has the side affect of dissallowing mutliple installs
+This has the side affect of disallowing multiple installs
     that have the same TagNumber and PackageID on the same day.
 \section{Part two adding Package Name and Computer Model}
-\subsection{New Table}
+\subsection{(4) New Table}
 \begin{table}[h]
 \centering
 \begin{tabular}{|c|c|c|c|c|c|}
@@ -201,17 +201,17 @@ WP09 & Balatro & 77740 & MSI & 05-27-2005 & 35.00 \\
 \hline
 \end{tabular}
 \end{table}
-\subsection{Functional Dependencies}
+\subsection{(5) Functional Dependencies}
 The functional dependencies are sets of columns where some
-    column(s) are depedent on their value(s) from other column(s).
+    column(s) are dependent on their value(s) from other column(s).
 In this table, PackageName is dependent on the PackageId and
-    ComputerModel is depdent on TagNumber which makes these two
-    functional dependenices.
-\subsection{Non 3NF-ness}
+    ComputerModel is dependent on TagNumber which makes these two
+    functional dependencies.
+\subsection{(6) Non 3NF-ness}
 This table is not in third normal form because a part,
     importantly not the whole, of the primary key
     functionally determines another column.
-Both of the aformentioned functional dependencies create
+Both of the aforementioned functional dependencies create
     this problem as, for example, with just the PackageID
     you already know what the PackageName will be.
 Practically, this creates duplication within the table
@@ -221,4 +221,29 @@ You could just have another table which maps the PackageId
     to its PackageName.
 This way you would only need to write the PackageName once
     in the spreadsheet.
+\section{Part three}
+\subsection{(7) Primary Keys}
+The primary keys for the tables to be split is the packageId, TagNumber,
+    and TagNumber + PackageID respectfully.
+\subsection{(8) Functional dependencies}
+The functional dependencies for each table is only its primary key: Packages is
+    PackageId, Installations is TagNumber and PackageId, finally Computers is
+    TagNumber.
+These are the functional dependencies because the other columns only rely on those
+    columns.
+\subsection{(9) 3NF}
+The tables are in third normal form because because there are no non-key or partial
+    key functional dependencies. There are also no functional dependencies for any other
+    columns onto another.
+The data also follows the previous forms of having no feilds with multiple items
+    following a structure in just one column.
+
+\newpage
+\subsection{(10) Lucid Chart Diagram}
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.8\textwidth]{assets/lucid_chart_db.png}
+  \caption{Crow's nest ER diagram}
+  \label{fig:lucid_chart_db}
+\end{figure}
 \end{document}
