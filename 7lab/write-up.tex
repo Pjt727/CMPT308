@@ -1,0 +1,224 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% CMPT 435
+% Lab Zero
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Short Sectioned Assignment
+% LaTeX Template
+% Version 1.0 (5/5/12)
+%
+% This template has been downloaded from: http://www.LaTeXTemplates.com
+% Original author: % Frits Wenneker (http://www.howtotex.com)
+% License: CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+% Modified by Alan G. Labouseur  - alan@labouseur.com, and Patrick Tyler - Patrick.Tyler1@marist.edu
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[letterpaper, 10pt]{article} 
+
+\usepackage[english]{babel} % English language/hyphenation
+\usepackage{graphicx}
+\usepackage[lined,linesnumbered,commentsnumbered]{algorithm2e}
+\usepackage{listings}
+\usepackage{fancyhdr} % Custom headers and footers
+\pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\usepackage{lastpage}
+\usepackage{url}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{xurl}
+\usepackage{multicol}
+
+% Stolen from https://www.overleaf.com/learn/latex/Code_listing 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+\lstset{style=mystyle, language=c++}
+
+
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[R]{}
+
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+
+\title{	
+   \normalfont \normalsize 
+   \textsc{CMPT 308 - Spring 2024 - Dr. Labouseur} \\[10pt] % Header stuff.
+   \horrule{0.5pt} \\[0.25cm] 	% Top horizontal rule
+   \huge Lab 7 -- ~Normalization \\     	    % Assignment title
+   \horrule{0.5pt} \\[0.25cm] 	% Bottom horizontal rule
+}
+
+\author{Patrick Tyler \\ \normalsize Patrick.Tyler1@marist.edu}
+
+\date{\normalsize\today} 	% Today's date.
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%   CONTENT SECTION
+%----------------------------------------------------------------------------------------
+
+% - -- -  - -- -  - -- -  -
+\section{Part one}
+\subsection{Original table}
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+PackageId & TagNumber & InstallDate & SoftwareCostUSD \\
+\hline
+AC01 & 32808 & 09-13-2005 & 754.95 \\
+\cline{1-4}
+DB32 & 32808 & 12-03-2005 & 380.00 \\
+     & 37691 & 06-15-2005 & 380.00 \\
+\cline{1-4}
+DB33 & 57772 & 05-27-2005 & 412.77 \\
+\cline{1-4}
+WP08 & 32808 & 01-12-2006 & 185.00 \\
+     & 37691 & 06-15-2005 & 227.50 \\
+     & 57222 & 05-27-2005 & 170.24 \\
+\cline{1-4}
+WP09 & 59836 & 10-30-2005 & 35.00 \\
+     & 77740 & 05-27-2005 & 35.00 \\
+\hline
+\end{tabular}
+\end{table}
+\subsection{My professional consulting opinion}
+Tycho manufacuting's board needs to fire the CEO 
+    as a software company I expected better. 
+Asumming this data is stored in a csv, excel, or some
+    other raw text table structure to store the spreadsheet,
+    the data is difficult to programatically add, update, delete
+    additional installs and packages.
+If an install needs to be deleted for whatever reason, the
+    row with that install would have to have its internal structure
+    of some columns edited to remove the correct install 
+    without affecting others.
+Additionally, nulls may also need to be left to store packages
+    without installs.
+Accidental deletions of packages from deleting installs could 
+    also be a problem.
+In my professional opinion, this data is not complex enough
+    to warrant a database, but it would help organizing
+    the spreadsheet more atomically.
+\subsection{Spreasheet in 1NF}
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+PackageId & TagNumber & InstallDate & SoftwareCostUSD \\
+\hline
+AC01 & 32808 & 09-13-2005 & 754.95 \\
+\cline{1-4}
+DB32 & 32808 & 12-03-2005 & 380.00 \\
+\cline{1-4}
+DB32 & 37691 & 06-15-2005 & 380.00 \\
+\cline{1-4}
+DB33 & 57772 & 05-27-2005 & 412.77 \\
+\cline{1-4}
+WP08 & 32808 & 01-12-2006 & 185.00 \\
+\cline{1-4}
+WP08 & 37691 & 06-15-2005 & 227.50 \\
+\cline{1-4}
+WP08 & 57222 & 05-27-2005 & 170.24 \\
+\cline{1-4}
+WP09 & 59836 & 10-30-2005 & 35.00 \\
+\cline{1-4}
+WP09 & 77740 & 05-27-2005 & 35.00 \\
+\hline
+\end{tabular}
+\end{table}
+\subsection{Primary key analaysis}
+The best primary key that can be made with these columns
+    is an composite key of the PackageID, TagNumber, 
+    and InstallDate.
+This has the side affect of dissallowing mutliple installs
+    that have the same TagNumber and PackageID on the same day.
+\section{Part two adding Package Name and Computer Model}
+\subsection{New Table}
+\begin{table}[h]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+PackageId & PackageName & TagNumber & ComputerModel & InstallDate & SoftwareCostUSD \\
+\hline
+AC01 & Zork & 32808 & Lenova & 09-13-2005 & 754.95 \\
+\cline{1-6}
+DB32 & Roket Leauge & 32808 & Lenova & 12-03-2005 & 380.00 \\
+\cline{1-6}
+DB32 & Rocket Leauge & 37691 & Apple & 06-15-2005 & 380.00 \\
+\cline{1-6}
+DB33 & Chocolately & 57772 & IBM & 05-27-2005 & 412.77 \\
+\cline{1-6}
+WP08 & Neovim & 32808 & Lenova & 01-12-2006 & 185.00 \\
+\cline{1-6}
+WP08 & Neovim & 37691 & Apple & 06-15-2005 & 227.50 \\
+\cline{1-6}
+WP08 & Neovim & 57222 & IBM & 05-27-2005 & 170.24 \\
+\cline{1-6}
+WP09 & Balatro & 59836 & Dell & 10-30-2005 & 35.00 \\
+\cline{1-6}
+WP09 & Balatro & 77740 & MSI & 05-27-2005 & 35.00 \\
+\hline
+\end{tabular}
+\end{table}
+\subsection{Functional Dependencies}
+The functional dependencies are sets of columns where some
+    column(s) are depedent on their value(s) from other column(s).
+In this table, PackageName is dependent on the PackageId and
+    ComputerModel is depdent on TagNumber which makes these two
+    functional dependenices.
+\subsection{Non 3NF-ness}
+This table is not in third normal form because a part,
+    importantly not the whole, of the primary key
+    functionally determines another column.
+Both of the aformentioned functional dependencies create
+    this problem as, for example, with just the PackageID
+    you already know what the PackageName will be.
+Practically, this creates duplication within the table
+    because you are storing identifying information of packages
+    twice.
+You could just have another table which maps the PackageId
+    to its PackageName.
+This way you would only need to write the PackageName once
+    in the spreadsheet.
+\end{document}
