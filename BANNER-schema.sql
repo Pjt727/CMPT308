@@ -10,7 +10,7 @@ CREATE TYPE dayOfWeek AS ENUM ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fr
 
 CREATE TABLE Professors (
     id SERIAL PRIMARY KEY,
-    emailAddress text,
+    email text UNIQUE,
     bannerId text UNIQUE , -- Never trust others
     firstName text,
     lastName text
