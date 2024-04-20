@@ -28,9 +28,10 @@ CREATE TABLE Subjects (
 );
 
 CREATE TABLE Courses (
-    number char(4),
-    subjectCode char(4) REFERENCES Subjects(code),
+    number char(10),
+    subjectCode char(10) REFERENCES Subjects(code),
     bannerId text UNIQUE,-- Never trust others
+    description text,
     name text,
     PRIMARY KEY(number, subjectCode)
 );
