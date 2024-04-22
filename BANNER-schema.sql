@@ -9,9 +9,9 @@ DROP TYPE IF EXISTS dayOfWeek;
 CREATE TYPE dayOfWeek AS ENUM ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
 
 CREATE TABLE Professors (
-    id SERIAL PRIMARY KEY,
-    email text UNIQUE,
-    bannerId text UNIQUE , -- Never trust others
+    -- sort of bad practice to use email because it might change but it
+    --     makes the data entry easier
+    email text PRIMARY KEY,
     firstName text,
     lastName text
 );
@@ -42,14 +42,15 @@ CREATE TABLE Sections (
     number char(4),
     term text, 
     bannerId text UNIQUE, -- Never trust others
-    primaryProfessor int REFERENCES Professors(id),
+    -- only storing primary professor for simplicity
+    primaryProfessor text REFERENCES Professors(email),
     FOREIGN KEY (courseNumber, subjectCode) REFERENCES Courses(number, subjectCode),
     PRIMARY KEY(courseNumber, subjectCode, number, term)
 );
 
 CREATE TABLE Meetings (
     courseNumber char(4),
-    subjectCode char(4),
+    subjectCode char(3),
     sectionNumber char(4),
     term text, 
     startTime TIME,
