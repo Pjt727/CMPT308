@@ -124,16 +124,20 @@ def add_professors_from(section_path: Path) -> dict[str, str]:
 
     return lines
 
-def add_all_section_declares():
-    pass
+def add_all_section_calls():
+    sample_data_path = "sample-data"
+    file_names = os.listdir(sample_data_path)
+    for filename in file_names:
+        if filename.startswith("sections"):
+            output = os.path.splitext(filename)[0] + ".sql"
+            add_sections_call(Path(os.path.join(sample_data_path, filename)), output, "Fall 2024")
 
-def add_sections_declare(sections_path: Path, output_name: str, term: str):
-    section_tuples: list[str] = []
-    course_numbers = []
-    subject_codes = []
-    numbers = []
-    banner_ids = []
-    primary_professors = []
+def add_sections_call(sections_path: Path, output_name: str, term: str):
+    course_numbers = ""
+    subject_codes = ""
+    numbers = ""
+    banner_ids = ""
+    primary_professors = ""
     with sections_path.open("r") as sections_f:
         sections = json.load(sections_f)
         # courseNumber, subjectCode, number, term, bannerId, primaryProfessor
@@ -143,21 +147,35 @@ def add_sections_declare(sections_path: Path, output_name: str, term: str):
                 ending = ""
             else:
                 ending = ","
-            course_numbers.append(f"'{section["courseNumber"]}'{ending}")
-            subject_codes.append(f"'{section["subject"]}'{ending}")
-            numbers.append(f"'{section["sequenceNumber"]}'{ending}")
-            banner_ids.append(f"'{section["id"]}'{ending}")
+            course_numbers += f"'{section["courseNumber"]}'{ending}"
+            subject_codes += f"'{section["subject"]}'{ending}"
+            numbers += f"'{section["sequenceNumber"]}'{ending}"
+            banner_ids += f"'{section["id"]}'{ending}"
             professor = "NULL"
             for fac in section["faculty"]:
                 if fac["primaryIndicator"]:
                     professor = fac["emailAddress"]
-            primary_professors.append(f"'{professor}'{ending}")
+            primary_professors += f"'{professor}'{ending}"
 
     with open(output_name, "w") as output:
-
-        pass
-
-
+        output.write("DO $$\n")
+        output.write("DECLARE\n")
+        output.write(f"\tterm text := '{term}';\n")
+        output.write(f"\tbanner_ids text[] := ARRAY[{banner_ids}];\n")
+        output.write(f"\tcourse_numbers text[] := ARRAY[{course_numbers}];\n")
+        output.write(f"\tsubject_codes text[] := ARRAY[{subject_codes}];\n")
+        output.write(f"\tnumbers text[] := ARRAY[{numbers}];\n")
+        output.write(f"\tprimary_professor_emails text[] := ARRAY[{primary_professors}];\n")
+        output.write("BEGIN\n")
+        output.write("\tSELECT upsert_sections_in_term(\n")
+        output.write("\t\tterm,\n")
+        output.write("\t\tbanner_ids,\n")
+        output.write("\t\tcourse_numbers,\n")
+        output.write("\t\tsubject_codes,\n")
+        output.write("\t\tnumbers,\n")
+        output.write("\t\tprimary_professor_emails\n")
+        output.write("\t);\n")
+        output.write("END $$;")
 
 
 def prints():
@@ -179,6 +197,7 @@ def main():
     generate_course_sql()
     add_schools_and_subjects()
     add_all_professors()
+    add_all_section_calls()
 
 if __name__ == "__main__":
     main()

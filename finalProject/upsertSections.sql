@@ -13,12 +13,12 @@
 
 
 CREATE OR REPLACE FUNCTION upsert_sections_in_term(
-    term text,
+    term_text text,
     banner_ids text[],
     course_numbers text[],
     subject_codes text[],
     numbers text[],
-    primary_professor_emails text[],
+    primary_professor_emails text[]
 )
 RETURNS void AS $$
 DECLARE
@@ -27,17 +27,17 @@ BEGIN
     -- delete sections
     DELETE FROM SECTIONS as s
     WHERE 
-        s.term like term AND
-        s.BannerId NOT IN banner_ids;
+        s.term like term_text AND
+        s.BannerId = ANY(banner_ids);
     FOR i IN 1..array_length(banner_ids, 1) LOOP
         INSERT INTO your_table_name 
-            (bannerId, courseNumber, subjectCode, number, term, primaryProfessor)
-        VALUES (banner_ids[i], course_numbers[i], subject_codes[i], numbers[i], term, 
+            (bannerId, courseNumber, subjectCode, number, term_text, primaryProfessor)
+        VALUES (banner_ids[i], course_numbers[i], subject_codes[i], numbers[i], term_text, 
             -- need to find the id of the professor
             (SELECT id
             FROM Professors p
             WHERE p.email like primary_professor_emails[i]
-            LIMIT 1;)
+            LIMIT 1)
         )
         -- Would mean that either ref errors from coures composite key or
         --   the section already exists which in that case should update
