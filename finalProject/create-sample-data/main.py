@@ -10,6 +10,8 @@ import json
 import os
 from pathlib import Path
 
+VALID_COURSES = set()
+
 def generate_course_sql():
     INSERT_STATEMENT = "INSERT INTO Courses (number, subjectCode, bannerId, name) VALUES\n"
     sample_courses_path = Path(os.path.join("sample-data", "courses.json"))
@@ -23,19 +25,11 @@ def generate_course_sql():
         length = len(sample_courses)
         # sql attacks...
         for i, course in enumerate(sample_courses):
-            allowed_chars = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 
-                             'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
-                             'u', 'v', 'w', 'x', 'y', 'z', '.', ',', ' ']
-            og_course_details: str = course.get("course_details", "None")
-            course_details = ""
-            for letter in og_course_details:
-                letter: str
-                if letter.lower() in allowed_chars:
-                    course_details += letter
             if length - 1 == i:
                 ending = ""
             else:
                 ending = ","
+            VALID_COURSES.add((course["subjectCode"], course["courseNumber"]))
 
             full_string = f'''    (\
 '{course["courseNumber"]}',\
@@ -136,26 +130,34 @@ def add_sections_call(sections_path: Path, output_name: str, term: str):
     course_numbers = ""
     subject_codes = ""
     numbers = ""
+    enrollments = ""
+    maximum_enrollments = ""
     banner_ids = ""
     primary_professors = ""
     with sections_path.open("r") as sections_f:
         sections = json.load(sections_f)
-        # courseNumber, subjectCode, number, term, bannerId, primaryProfessor
+        # courseNumber, subjectCode, number, enrollment, term, bannerId, primaryProfessor
         length = len(sections)
         for i, section in enumerate(sections):
             if i == length - 1:
                 ending = ""
             else:
                 ending = ","
+
+            if (section["subject"], section["courseNumber"]) not in VALID_COURSES:
+                continue
+
             course_numbers += f"'{section["courseNumber"]}'{ending}"
             subject_codes += f"'{section["subject"]}'{ending}"
             numbers += f"'{section["sequenceNumber"]}'{ending}"
+            enrollments += f"{section["enrollment"]}{ending}"
+            maximum_enrollments += f"{section["maximumEnrollment"]}{ending}" 
             banner_ids += f"'{section["id"]}'{ending}"
             professor = "NULL"
             for fac in section["faculty"]:
                 if fac["primaryIndicator"]:
-                    professor = fac["emailAddress"]
-            primary_professors += f"'{professor}'{ending}"
+                    professor = f"'{fac["emailAddress"]}'"
+            primary_professors += f"{professor}{ending}"
 
     with open(output_name, "w") as output:
         output.write("DO $$\n")
@@ -163,14 +165,18 @@ def add_sections_call(sections_path: Path, output_name: str, term: str):
         output.write(f"\tterm text := '{term}';\n")
         output.write(f"\tbanner_ids text[] := ARRAY[{banner_ids}];\n")
         output.write(f"\tcourse_numbers text[] := ARRAY[{course_numbers}];\n")
+        output.write(f"\tenrollments int[] := ARRAY[{enrollments}];\n")
+        output.write(f"\tmaximum_enrollments int[] := ARRAY[{maximum_enrollments}];\n")
         output.write(f"\tsubject_codes text[] := ARRAY[{subject_codes}];\n")
         output.write(f"\tnumbers text[] := ARRAY[{numbers}];\n")
         output.write(f"\tprimary_professor_emails text[] := ARRAY[{primary_professors}];\n")
         output.write("BEGIN\n")
-        output.write("\tSELECT upsert_sections_in_term(\n")
+        output.write("\tPERFORM upsert_sections_in_term(\n")
         output.write("\t\tterm,\n")
         output.write("\t\tbanner_ids,\n")
         output.write("\t\tcourse_numbers,\n")
+        output.write("\t\tenrollments,\n")
+        output.write("\t\tmaximum_enrollments,\n")
         output.write("\t\tsubject_codes,\n")
         output.write("\t\tnumbers,\n")
         output.write("\t\tprimary_professor_emails\n")

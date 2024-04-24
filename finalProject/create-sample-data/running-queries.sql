@@ -1,1 +1,1 @@
-SELECT * FROM Professors WHERE firstName = 'Alan'
+SELECT * FROM Sections WHERE enrollment != 0;
