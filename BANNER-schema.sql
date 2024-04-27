@@ -39,6 +39,8 @@ CREATE TABLE Sections (
     courseNumber char(4),
     subjectCode char(4),
     number char(4),
+    enrollment int,
+    maximum_enrollment int,
     term text, 
     bannerId text UNIQUE, -- Never trust others
     -- only storing primary professor for simplicity
@@ -56,7 +58,7 @@ CREATE TABLE Meetings (
     day dayOfWeek,
     duration INTERVAL,
     FOREIGN KEY (courseNumber, subjectCode, sectionNumber, term) 
-        REFERENCES Sections(courseNumber, subjectCode, number, term),
+        REFERENCES Sections(courseNumber, subjectCode, number, term) ON DELETE CASCADE,
     PRIMARY KEY(courseNumber, subjectCode, sectionNumber, term, startTime, day)
 );
 

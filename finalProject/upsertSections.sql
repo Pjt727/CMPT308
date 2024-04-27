@@ -1,3 +1,9 @@
+-- procedure to update sections utilizing bannerId to match the exact sections
+-- if bannerId is not reliable should change but bannerId allows the program to
+-- more accurately and easily do the right change to the section (update, create, delete)
+-- such that triggers can will be called correctly... if bannerId could not be relied
+-- on the database will still be fine but this procedure will produce unexpected behavior
+
 -- Comentary for later parts
 -- This set up is NOT built to be performant I am not sql expert,
 --    still some of these things cause me worry:
@@ -11,11 +17,12 @@
 --    sections are replaced by the temp data (or maybe have the update triggers happen on create of the temp 
 --    sections table)
 
-
 CREATE OR REPLACE FUNCTION upsert_sections_in_term(
     term_text text,
     banner_ids text[],
     course_numbers text[],
+    enrollments int[],
+    maximum_enrollments int[],
     subject_codes text[],
     numbers text[],
     primary_professor_emails text[]
@@ -25,28 +32,32 @@ DECLARE
     i int;
 BEGIN
     -- delete sections
-    DELETE FROM SECTIONS as s
+    DELETE FROM Sections as s
     WHERE 
         s.term like term_text AND
         s.BannerId = ANY(banner_ids);
     FOR i IN 1..array_length(banner_ids, 1) LOOP
-        INSERT INTO your_table_name 
-            (bannerId, courseNumber, subjectCode, number, term_text, primaryProfessor)
-        VALUES (banner_ids[i], course_numbers[i], subject_codes[i], numbers[i], term_text, 
-            -- need to find the id of the professor
-            (SELECT id
-            FROM Professors p
-            WHERE p.email like primary_professor_emails[i]
-            LIMIT 1)
-        )
+        INSERT INTO Sections 
+            (bannerId, courseNumber, subjectCode, number, enrollment, maximum_enrollment, term, primaryProfessor)
+        VALUES (
+            banner_ids[i],
+            course_numbers[i],
+            subject_codes[i],
+            numbers[i],
+            enrollments[i],
+            maximum_enrollments[i],
+            term_text,
+            primary_professor_emails[i])
         -- Would mean that either ref errors from coures composite key or
         --   the section already exists which in that case should update
-        ON CONFLICT (banner_id) DO UPDATE
-        SET course_number = EXCLUDED.course_number,
-            subject_code = EXCLUDED.subject_code,
-            number = EXCLUDED.number,
-            term = EXCLUDED.term,
-            primary_professor_email = EXCLUDED.primary_professor_email;
+        ON CONFLICT (bannerId) DO UPDATE
+        SET courseNumber = course_numbers[i],
+            subjectCode = subject_codes[i],
+            number = numbers[i],
+            enrollment = enrollments[i],
+            maximum_enrollment = maximum_enrollments[i],
+            term = term_text,
+            primaryProfessor = primary_professor_emails[i];
         -- Would fail again on ref errors which is wanted
     END LOOP;
 END;
