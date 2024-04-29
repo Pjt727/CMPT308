@@ -134,6 +134,7 @@ def add_sections_call(sections_path: Path, output_name: str, term: str):
     maximum_enrollments = ""
     banner_ids = ""
     primary_professors = ""
+    meeting_lines = []
     with sections_path.open("r") as sections_f:
         sections = json.load(sections_f)
         # courseNumber, subjectCode, number, enrollment, term, bannerId, primaryProfessor
@@ -159,6 +160,49 @@ def add_sections_call(sections_path: Path, output_name: str, term: str):
                     professor = f"'{fac["emailAddress"]}'"
             primary_professors += f"{professor}{ending}"
 
+            meeting_line = "PERFORM upsert_meetings_in_section("
+            meeting_line += f"'{section["courseNumber"]}', " 
+            meeting_line += f"'{section["subject"]}', " 
+            meeting_line += f"'{section["sequenceNumber"]}', " 
+            meeting_line += f"'{term}', " 
+            start_times = ""
+            days = ""
+            durations = ""
+            for meeting in section["meetingsFaculty"]:
+                time = meeting["meetingTime"]
+                days_keys = [
+                    ("Monday", "monday"), 
+                    ("Tuesday", "tuesday"), 
+                    ("Wednesday", "wednesday"), 
+                    ("Thursday", "thursday"), 
+                    ("Friday", "friday"), 
+                    ("Saturday", "saturday"), 
+                    ("Sunday", "sunday"), 
+                ]
+                for db_enum_val, key in days_keys:
+                    if not time[key]: continue
+                    days += f"'{db_enum_val}',"
+                    hours = time["beginTime"][:2]
+                    minutes = time["beginTime"][2:]
+                    start_times += f"'{hours}:{minutes}:00',"
+                    start_minutes = int(hours) * 60 + int(minutes)
+                    end_minutes = int(time["endTime"][:2]) * 60 + int(time["endTime"][2:])
+                    durations += f"'{end_minutes - start_minutes}m',"
+
+            # remove trailing comma
+            if days:
+                days = days[:-1]
+                start_times = start_times[:-1]
+                durations = durations[:-1]
+            meeting_line += f"ARRAY[{start_times}], "
+            meeting_line += f"ARRAY[{days}], "
+            meeting_line += f"ARRAY[{durations}]"
+            meeting_line += ");\n"
+            meeting_lines.append(meeting_line)
+
+
+
+
     with open(output_name, "w") as output:
         output.write("DO $$\n")
         output.write("DECLARE\n")
@@ -181,7 +225,8 @@ def add_sections_call(sections_path: Path, output_name: str, term: str):
         output.write("\t\tnumbers,\n")
         output.write("\t\tprimary_professor_emails\n")
         output.write("\t);\n")
-        output.write("END $$;")
+        output.write("END $$;\n")
+        output.writelines(meeting_lines)
 
 
 def prints():
