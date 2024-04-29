@@ -38,7 +38,7 @@ BEGIN
         s.BannerId = ANY(banner_ids);
     FOR i IN 1..array_length(banner_ids, 1) LOOP
         INSERT INTO Sections 
-            (bannerId, courseNumber, subjectCode, number, enrollment, maximum_enrollment, term, primaryProfessor)
+            (bannerId, courseNumber, subjectCode, number, enrollment, maximumEnrollment, term, primaryProfessor)
         VALUES (
             banner_ids[i],
             course_numbers[i],
@@ -55,7 +55,7 @@ BEGIN
             subjectCode = subject_codes[i],
             number = numbers[i],
             enrollment = enrollments[i],
-            maximum_enrollment = maximum_enrollments[i],
+            maximumEnrollment = maximum_enrollments[i],
             term = term_text,
             primaryProfessor = primary_professor_emails[i];
         -- Would fail again on ref errors which is wanted
