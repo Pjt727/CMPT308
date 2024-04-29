@@ -8,6 +8,8 @@ DROP TABLE IF EXISTS Professors;
 DROP TYPE IF EXISTS dayOfWeek;
 CREATE TYPE dayOfWeek AS ENUM ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
 
+
+
 CREATE TABLE Professors (
     -- sort of bad practice to use email because it might change but it
     --     makes the data entry easier
@@ -47,6 +49,27 @@ CREATE TABLE Sections (
     primaryProfessor text REFERENCES Professors(email),
     FOREIGN KEY (courseNumber, subjectCode) REFERENCES Courses(number, subjectCode),
     PRIMARY KEY(courseNumber, subjectCode, number, term)
+);
+
+CREATE TABLE Students (
+    id SERIAL PRIMARY KEY, 
+    firstName text,
+);
+
+CREATE TABLE PreferredEnrollments (
+    courseNumber char(4),
+    subjectCode char(4),
+    sectionNumber char(4),
+    term text,
+    studentId int REFERENCES Students(id),
+    FOREIGN KEY (courseNumber, subjectCode, number, term)
+        REFERENCES Sections(courseNumber, subjectCode, number, term) ON DELETE CASCADE,
+    PRIMARY KEY(courseNumber, subjectCode, sectionNumber, term, studentId)
+);
+
+CREATE TABLE Messages (
+    studentId int REFERENCES Students(id),
+    message text
 );
 
 CREATE TABLE Meetings (
