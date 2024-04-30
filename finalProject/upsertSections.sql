@@ -35,7 +35,8 @@ BEGIN
     DELETE FROM Sections as s
     WHERE 
         s.term like term_text AND
-        s.BannerId = ANY(banner_ids);
+        s.BannerId NOT IN (SELECT unnest(banner_ids));
+
     FOR i IN 1..array_length(banner_ids, 1) LOOP
         INSERT INTO Sections 
             (bannerId, courseNumber, subjectCode, number, enrollment, maximumEnrollment, term, primaryProfessor)

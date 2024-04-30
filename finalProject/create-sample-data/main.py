@@ -160,7 +160,7 @@ def add_sections_call(sections_path: Path, output_name: str, term: str):
                     professor = f"'{fac["emailAddress"]}'"
             primary_professors += f"{professor}{ending}"
 
-            meeting_line = "PERFORM upsert_meetings_in_section("
+            meeting_line = "SELECT upsert_meetings_in_section("
             meeting_line += f"'{section["courseNumber"]}', " 
             meeting_line += f"'{section["subject"]}', " 
             meeting_line += f"'{section["sequenceNumber"]}', " 
@@ -194,9 +194,9 @@ def add_sections_call(sections_path: Path, output_name: str, term: str):
                 days = days[:-1]
                 start_times = start_times[:-1]
                 durations = durations[:-1]
-            meeting_line += f"ARRAY[{start_times}], "
-            meeting_line += f"ARRAY[{days}], "
-            meeting_line += f"ARRAY[{durations}]"
+            meeting_line += f"ARRAY[{start_times}]::TIME[], "
+            meeting_line += f"ARRAY[{days}]::dayOfWeek[], "
+            meeting_line += f"ARRAY[{durations}]::INTERVAL[]"
             meeting_line += ");\n"
             meeting_lines.append(meeting_line)
 
@@ -247,7 +247,7 @@ def main():
     #prints()
     generate_course_sql()
     add_schools_and_subjects()
-    add_all_professors()
+    #add_all_professors()
     add_all_section_calls()
 
 if __name__ == "__main__":

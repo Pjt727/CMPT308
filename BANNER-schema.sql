@@ -1,11 +1,14 @@
+DROP TABLE IF EXISTS PreferredEnrollments;
+DROP TABLE IF EXISTS Messages;
 DROP TABLE IF EXISTS Meetings;
 DROP TABLE IF EXISTS Sections;
 DROP TABLE IF EXISTS Courses;
 DROP TABLE IF EXISTS Subjects;
 DROP TABLE IF EXISTS Schools;
 DROP TABLE IF EXISTS Professors;
+DROP TABLE IF EXISTS Students;
 
-DROP TYPE IF EXISTS dayOfWeek;
+DROP TYPE IF EXISTS dayOfWeek CASCADE;
 CREATE TYPE dayOfWeek AS ENUM ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
 
 
@@ -42,7 +45,7 @@ CREATE TABLE Sections (
     subjectCode char(4),
     number char(4),
     enrollment int,
-    maximum_enrollment int,
+    maximumEnrollment int,
     term text, 
     bannerId text UNIQUE, -- Never trust others
     -- only storing primary professor for simplicity
@@ -53,7 +56,7 @@ CREATE TABLE Sections (
 
 CREATE TABLE Students (
     id SERIAL PRIMARY KEY, 
-    firstName text,
+    firstName text
 );
 
 CREATE TABLE PreferredEnrollments (
@@ -62,7 +65,7 @@ CREATE TABLE PreferredEnrollments (
     sectionNumber char(4),
     term text,
     studentId int REFERENCES Students(id),
-    FOREIGN KEY (courseNumber, subjectCode, number, term)
+    FOREIGN KEY (courseNumber, subjectCode, sectionNumber, term)
         REFERENCES Sections(courseNumber, subjectCode, number, term) ON DELETE CASCADE,
     PRIMARY KEY(courseNumber, subjectCode, sectionNumber, term, studentId)
 );
@@ -74,7 +77,7 @@ CREATE TABLE Messages (
 
 CREATE TABLE Meetings (
     courseNumber char(4),
-    subjectCode char(3),
+    subjectCode char(4),
     sectionNumber char(4),
     term text, 
     startTime TIME,
@@ -84,4 +87,3 @@ CREATE TABLE Meetings (
         REFERENCES Sections(courseNumber, subjectCode, number, term) ON DELETE CASCADE,
     PRIMARY KEY(courseNumber, subjectCode, sectionNumber, term, startTime, day)
 );
-

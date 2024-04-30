@@ -14,17 +14,19 @@ CREATE OR REPLACE FUNCTION upsert_meetings_in_section(
     term_text text,
     start_times TIME[],
     days dayOfWeek[],
-    duration INTERVAL[]
+    durations INTERVAL[]
 )
 RETURNS void AS $$
 DECLARE
     i int;
     do_create_index boolean;
+    dont_update boolean;
     meeting_count INTEGER;
     created_indices int[];
     -- work around to update a single record bc you can not limit on an update
     start_time_to_update TIME;
     day_to_update dayOfWeek;
+    debugging RECORD;
 BEGIN
     SELECT COUNT(*) INTO meeting_count FROM Meetings m
     WHERE
@@ -35,7 +37,8 @@ BEGIN
     ;
 
     -- If adding count is 0 delete everything
-    IF meeting_count = 0 THEN
+    IF cardinality(start_times) = 0 THEN
+        RAISE NOTICE 'delete everything';
         DELETE FROM Meetings m
         WHERE
             m.courseNumber = course_number AND
@@ -44,8 +47,25 @@ BEGIN
             m.term = term_text
         ;
     -- If the counts are equal only update
-    ELSIF meeting_count = array_length(start_times) THEN
+    ELSIF meeting_count = cardinality(start_times) THEN
+        RAISE NOTICE 'equal counts';
         FOR i IN 1..array_length(start_times, 1) LOOP
+            -- Skip if meeting is already in the section
+            IF 
+            EXISTS (
+                SELECT 1
+                FROM Meetings m
+                WHERE
+                    m.courseNumber = course_number AND
+                    m.subjectCode = subject_code AND
+                    m.sectionNumber = section_number AND
+                    m.term = term_text AND
+                    m.startTime = start_times[i] AND 
+                    m.day = days[i]
+                )
+                THEN
+                CONTINUE;
+            END IF;
             -- Update the first meeting that has changed
             SELECT m.day, m.startTime
             INTO day_to_update, start_time_to_update
@@ -58,18 +78,18 @@ BEGIN
                 -- Remove records matching to inserted meetings
                 --   it is important that this query is ran for each iteration
                 --   because as the meetings could be updated in prior iterations
-                NOT EXISTS (
-                    SELECT 1
-                    FROM (
-                        SELECT unnest(startTimes) AS startTime, unnest(days) AS day
-                    ) existing
-                    WHERE m.startTime = existing.startTime AND m.day = existing.day
+               (m.startTime, m.day) NOT IN (
+                  SELECT unnest(start_times), unnest(days)
                 )
             LIMIT 1;
+
+            RAISE NOTICE '%, %', day_to_update, start_time_to_update;
+            RAISE NOTICE '%, %', days[i], start_times[i];
 
             UPDATE Meetings m
             SET
                 startTime = start_times[i],
+                duration = durations[i],
                 day = days[i]
             WHERE 
                 m.courseNumber = course_number AND
@@ -81,34 +101,34 @@ BEGIN
             ;
         END LOOP;
     -- If the adding count is more only create/ update
-    ELSIF meeting_count < array_length(startTime) THEN
+    ELSIF meeting_count < cardinality(start_times) THEN
+        RAISE NOTICE 'add / update';
         -- finds the first one that does not match and then changes it
         FOR i IN 1..array_length(start_times, 1) LOOP
             -- done creating new meetings now only consider updating
-            IF array_length(created_indices) >= ABS(array_length(startTimes) - meeting_count) THEN
+            IF cardinality(created_indices) >= ABS(cardinality(start_times) - meeting_count) THEN
                 RETURN;
             END IF;
-            SELECT 
-            NOT EXISTS
-                (SELECT 1 FROM Meetings m
+            RAISE NOTICE '\n\n%', i;
+            SELECT EXISTS (
+                SELECT 1
+                FROM Meetings m
                 WHERE 
                     m.courseNumber = course_number AND
                     m.subjectCode = subject_code AND
                     m.sectionNumber = section_number AND
                     m.term = term_text AND
-                    -- Remove records matching to inserted meetings
-                    NOT EXISTS (
-                        SELECT 1
-                        FROM (
-                            SELECT unnest(startTimes) AS startTime, unnest(days) AS day
-                        ) existing
-                        WHERE m.startTime = existing.startTime AND m.day = existing.day
-                    )
-                ) INTO do_create_index;
-            IF do_create_index THEN
+                    -- see if start_time/ day is already in the db
+                    m.startTime = start_times[i] AND
+                    m.day = days[i]
+            ) 
+            INTO do_create_index;
+
+            RAISE NOTICE '%, %,%', do_create_index, start_times[i], days[i];
+            IF not do_create_index THEN
                 created_indices := array_append(created_indices, i);
                 INSERT INTO Meetings (courseNumber, subjectCode, sectionNumber, term, startTime, day, duration) 
-                VALUES (courseNumber, subjectCode, sectionNumber, term, startTimes[i], days[i], durations[i])
+                VALUES (course_number, subject_code, section_number, term_text, start_times[i], days[i], durations[i])
                 ;
             END IF;
         END LOOP;
@@ -117,29 +137,44 @@ BEGIN
             -- skip if this one was already created
             IF i != ANY(created_indices) THEN
                 -- possibly update a meeting
+
+                -- SELECT m.day, m.startTime
+                -- INTO day_to_update, start_time_to_update
+                -- FROM Meetings m
+                -- WHERE
+                --     m.courseNumber = course_number AND
+                --     m.subjectCode = subject_code AND
+                --     m.sectionNumber = section_number AND
+                --     m.term = term_text AND
+                --     NOT EXISTS (
+                --         SELECT 1
+                --         FROM (
+                --             SELECT unnest(start_times) AS startTime, unnest(days) AS day
+                --         ) existing
+                --         WHERE m.startTime = existing.startTime AND m.day = existing.day
+                --     )
+                -- LIMIT 1;
+
                 SELECT m.day, m.startTime
                 INTO day_to_update, start_time_to_update
                 FROM Meetings m
-                WHERE
+                WHERE 
                     m.courseNumber = course_number AND
                     m.subjectCode = subject_code AND
                     m.sectionNumber = section_number AND
                     m.term = term_text AND
-                    -- Remove records matching to inserted meetings
-                    --   it is important that this query is ran for each iteration
-                    --   because as the meetings could be updated in prior iterations
-                    NOT EXISTS (
-                        SELECT 1
-                        FROM (
-                            SELECT unnest(startTimes) AS startTime, unnest(days) AS day
-                        ) existing
-                        WHERE m.startTime = existing.startTime AND m.day = existing.day
+                -- Remove records matching to inserted meetings
+                --   it is important that this query is ran for each iteration
+                --   because as the meetings could be updated in prior iterations
+                    (m.startTime, m.day) NOT IN (
+                        SELECT unnest(start_times), unnest(days)
                     )
                 LIMIT 1;
 
                 UPDATE Meetings m
                 SET
                     startTime = start_times[i],
+                    duration = durations[i],
                     day = days[i]
                 WHERE 
                     m.courseNumber = course_number AND
@@ -153,10 +188,11 @@ BEGIN
         END LOOP;
     -- If the adding count is less only delete/ update
     ELSE
+        RAISE NOTICE 'delete / update';
         -- delete every meeting that does not match BUT limit based off
         --    of difference because we may delete some and then update others
         --    have to use for loop because you cannot delete based off limit
-        FOR i IN 1..ABS(array_length(statTimes) - meeting_count) LOOP
+        FOR i IN 1..ABS(cardinality(start_times) - meeting_count) LOOP
             SELECT m.day, m.startTime
             INTO day_to_update, start_time_to_update
             FROM Meetings m
@@ -171,7 +207,7 @@ BEGIN
                 NOT EXISTS (
                     SELECT 1
                     FROM (
-                        SELECT unnest(startTimes) AS startTime, unnest(days) AS day
+                        SELECT unnest(start_times) AS startTime, unnest(days) AS day
                     ) existing
                     WHERE m.startTime = existing.startTime AND m.day = existing.day
                 )
@@ -203,7 +239,7 @@ BEGIN
                 NOT EXISTS (
                     SELECT 1
                     FROM (
-                        SELECT unnest(startTimes) AS startTime, unnest(days) AS day
+                        SELECT unnest(start_times) AS startTime, unnest(days) AS day
                     ) existing
                     WHERE m.startTime = existing.startTime AND m.day = existing.day
                 )
@@ -212,6 +248,7 @@ BEGIN
             UPDATE Meetings m
             SET
                 startTime = start_times[i],
+                duration = durations[i],
                 day = days[i]
             WHERE 
                 m.courseNumber = course_number AND

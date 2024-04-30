@@ -436,6 +436,5 @@ INSERT INTO Professors (email, firstName, lastName) VALUES
 ('John.Ringel1@marist.edu', 'John', 'Ringel'),
 ('Ibrahim.Shaikh@marist.edu', 'Ibrahim', 'Shaikh'),
 ('Francis.Kelly@marist.edu', 'Francis', 'Kelly'),
-('Malinda.Behrens@marist.edu', 'Malinda', 'Behrens'),
-
+('Malinda.Behrens@marist.edu', 'Malinda', 'Behrens')
 ;
