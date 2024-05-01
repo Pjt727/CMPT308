@@ -1,16 +1,16 @@
-DROP TABLE IF EXISTS PreferredEnrollments;
-DROP TABLE IF EXISTS Messages;
-DROP TABLE IF EXISTS Meetings;
-DROP TABLE IF EXISTS Sections;
-DROP TABLE IF EXISTS Courses;
-DROP TABLE IF EXISTS Subjects;
-DROP TABLE IF EXISTS Schools;
-DROP TABLE IF EXISTS Professors;
-DROP TABLE IF EXISTS Students;
+DROP TABLE IF EXISTS PreferredEnrollments CASCADE;
+DROP TABLE IF EXISTS Messages CASCADE;
+DROP TABLE IF EXISTS Meetings CASCADE;
+DROP TABLE IF EXISTS Sections CASCADE;
+DROP TABLE IF EXISTS Courses CASCADE;
+DROP TABLE IF EXISTS Subjects CASCADE;
+DROP TABLE IF EXISTS Schools CASCADE;
+DROP TABLE IF EXISTS Professors CASCADE;
+DROP TABLE IF EXISTS Students CASCADE;
+
 
 DROP TYPE IF EXISTS dayOfWeek CASCADE;
 CREATE TYPE dayOfWeek AS ENUM ('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
-
 
 
 CREATE TABLE Professors (
@@ -34,21 +34,23 @@ CREATE TABLE Subjects (
 
 CREATE TABLE Courses (
     number char(10),
-    subjectCode char(10) REFERENCES Subjects(code),
+    subjectCode char(4) REFERENCES Subjects(code),
     bannerId text UNIQUE,-- Never trust others
     name text,
     PRIMARY KEY(number, subjectCode)
 );
 
 CREATE TABLE Sections (
-    courseNumber char(4),
+    courseNumber char(10),
     subjectCode char(4),
     number char(4),
-    enrollment int,
-    maximumEnrollment int,
-    term text, 
+    -- term must be a season followed by 4 numbers 
+    -- note season year is an atomic term for this use case
+    term text CHECK (term ~ '^(Winter|Spring|Summer|Fall) \d{4}$'), 
+    enrollment int CHECK (enrollment >= 0),
+    maximumEnrollment int CHECK (enrollment >= 0),
     bannerId text UNIQUE, -- Never trust others
-    -- only storing primary professor for simplicity
+    -- only storing doing email for simplicity of adding data
     primaryProfessor text REFERENCES Professors(email),
     FOREIGN KEY (courseNumber, subjectCode) REFERENCES Courses(number, subjectCode),
     PRIMARY KEY(courseNumber, subjectCode, number, term)
@@ -60,7 +62,7 @@ CREATE TABLE Students (
 );
 
 CREATE TABLE PreferredEnrollments (
-    courseNumber char(4),
+    courseNumber char(10),
     subjectCode char(4),
     sectionNumber char(4),
     term text,
@@ -71,6 +73,7 @@ CREATE TABLE PreferredEnrollments (
 );
 
 CREATE TABLE Messages (
+    id SERIAL PRIMARY KEY,
     studentId int REFERENCES Students(id),
     message text
 );
@@ -87,3 +90,18 @@ CREATE TABLE Meetings (
         REFERENCES Sections(courseNumber, subjectCode, number, term) ON DELETE CASCADE,
     PRIMARY KEY(courseNumber, subjectCode, sectionNumber, term, startTime, day)
 );
+
+-- teacher may may only view
+CREATE ROLE teacher;
+GRANT SELECT ON all tables in schema public TO student;
+
+-- student needs to manage messages and preferred enrollments and view everything
+CREATE ROLE student;
+GRANT SELECT ON all tables in schema public TO student;
+GRANT UPDATE ON Students TO student;
+GRANT UPDATE, INSERT, DELETE ON PreferredEnrollments, Messages TO student;
+
+-- registrar need manage everything
+CREATE ROLE registrar;
+GRANT ALL ON all tables in schema public TO registrar;
+

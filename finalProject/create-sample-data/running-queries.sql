@@ -68,13 +68,19 @@
 -- 	);
 -- END $$;
 
-SELECT * FROM Sections s
-WHERE s.bannerId = '175517';
+-- SELECT * FROM Sections s
+-- WHERE s.bannerId = '175517';
+-- 
+-- 
+-- UPDATE Sections
+-- SET enrollment = 18
+-- WHERE bannerId = '175517';
+-- 
+-- SELECT * FROM Sections s
+-- WHERE s.bannerId = '175517';
 
+SELECT * FROM
+Sections s
+WHERE s.primaryProfessor = 'Alan.Labouseur@marist.edu'
+-- SELECT * FROM Sections
 
-UPDATE Sections
-SET enrollment = 18
-WHERE bannerId = '175517';
-
-SELECT * FROM Sections s
-WHERE s.bannerId = '175517';

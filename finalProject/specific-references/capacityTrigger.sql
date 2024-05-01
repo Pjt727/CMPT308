@@ -26,13 +26,9 @@ BEGIN
             (NEW.maximumEnrollment - NEW.enrollment) || ' seats left!!';
     END IF;
 
-    IF do_message THEN
-        RAISE NOTICE '%, %, %, %', NEW.courseNumber, new.subjectCode, new.number, new.term;
-        RAISE NOTICE '%', message;
-    END IF;
 
-    IF do_message AND student != NULL THEN
-        SELECT p.studentID 
+    IF do_message THEN
+        SELECT ARRAY_AGG(p.studentID) 
         INTO students
         FROM PreferredEnrollments p 
         WHERE
@@ -40,10 +36,13 @@ BEGIN
             p.subjectCode = NEW.subjectCode AND
             p.sectionNumber = NEW.number AND
             p.term = NEW.term;
-        FOREACH student in ARRAY students LOOP
-            INSERT INTO Messages (studentId, message)
-            VALUES(student, message);
-        END LOOP;
+
+        IF array_length(students, 1) >= 1 THEN
+            FOREACH student in ARRAY students LOOP
+                INSERT INTO Messages (studentId, message)
+                VALUES(student, message);
+            END LOOP;
+        END IF;
     END IF;
 
     RETURN NEW;
